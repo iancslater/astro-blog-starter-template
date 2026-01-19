@@ -1,3 +1,10 @@
+---
+title: "Test Page - Imported"
+description: "Lorem ipsum dolor sit amet"
+pubDate: "Jan 18 2026"
+heroImage: "/blog-placeholder-4.jpg"
+---
+
 # <a name="top"></a>Markdown Test Page
 
 * [Headings](#Headings)
