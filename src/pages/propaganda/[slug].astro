@@ -1,7 +1,6 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import PropagandaPost from '../../layouts/PropagandaPost.astro';
-import PropagandaMetaBox from '../../components/PropagandaMetaBox.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('propaganda');
@@ -24,6 +23,7 @@ const fileNo = `${FILE_PREFIX}${entry.id.toUpperCase().replace(/-/g, ' ')}`;
 const classification = entry.data.type === 'poster' ? 'CONTROLLED' : 'RESTRICTED';
 const displayYear = entry.data.year || 'UNKNOWN';
 const displaySize = entry.data.printSize || 'STANDARD';
+const displayTags = entry.data.tags?.length ? entry.data.tags.join(', ').toUpperCase() : 'NONE';
 
 // Determine stamp text based on tags and type
 const getStampText = () => {
@@ -66,17 +66,55 @@ const stampText = getStampText();
         <span class="label">SIZE</span>
         <span class="value">{displaySize}</span>
       </div>
+      <div class="strip-item">
+        <span class="label">TAGS</span>
+        <span class="value">{displayTags}</span>
+      </div>
     </div>
 
-    <!-- 3) Metadata card -->
+    <!-- 3) Inventory Control Notes -->
     <div class="meta-card">
-      <PropagandaMetaBox
-        type={entry.data.type}
-        year={entry.data.year}
-        printSize={entry.data.printSize}
-        orientation={entry.data.orientation}
-        tags={entry.data.tags}
-      />
+      <section class="inventory-notes" aria-label="Inventory control notes">
+        <!-- Header row -->
+        <div class="inventory-header">
+          <div class="header-text">
+            <h2 class="inventory-title">INVENTORY CONTROL NOTES</h2>
+            <p class="form-line">FORM NU-IC-12 • DO NOT DUPLICATE</p>
+          </div>
+          <div class="stamp-small" aria-label="Stamp: AUDITED">AUDITED</div>
+        </div>
+
+        <!-- Typed checklist grid -->
+        <div class="inventory-grid">
+          <div class="grid-row">
+            <span class="grid-label">REPRODUCTION:</span>
+            <span class="grid-value">{classification}</span>
+          </div>
+          <div class="grid-row">
+            <span class="grid-label">DUPLICATION PERMIT:</span>
+            <span class="grid-value">NOT GRANTED</span>
+          </div>
+          <div class="grid-row">
+            <span class="grid-label">CHAIN OF CUSTODY:</span>
+            <span class="grid-value">ARCHIVE → FIELD → ARCHIVE</span>
+          </div>
+          <div class="grid-row">
+            <span class="grid-label">LAST AUDIT:</span>
+            <span class="grid-value">{displayYear}</span>
+          </div>
+          <div class="grid-row">
+            <span class="grid-label">DISP. STATUS:</span>
+            <span class="grid-value">RETURN AFTER PRINT</span>
+          </div>
+        </div>
+
+        <!-- Handwritten scribble block -->
+        <div class="handwritten">
+          <p>Do NOT display in public windows.</p>
+          <p>Monitor for unauthorized copies.</p>
+          <p>Return to archive immediately after printing.</p>
+        </div>
+      </section>
     </div>
 
     <!-- 4) Asset grid: preview + actions -->
@@ -243,7 +281,7 @@ const stampText = getStampText();
   }
 
   /* ============================================
-     METADATA CARD
+     METADATA CARD (now Inventory Control Notes)
      ============================================ */
   .meta-card {
     padding: var(--spacing-md);
@@ -251,33 +289,156 @@ const stampText = getStampText();
     border: 1px solid var(--dossier-border);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
     margin-bottom: var(--spacing-lg);
+    position: relative;
+    /* Add faint ledger/grid background */
+    background-image: 
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 19px,
+        rgba(139, 125, 107, 0.1) 19px,
+        rgba(139, 125, 107, 0.1) 20px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 19px,
+        rgba(139, 125, 107, 0.08) 19px,
+        rgba(139, 125, 107, 0.08) 20px
+      );
+    background-color: rgba(255, 255, 255, 0.6);
   }
 
-  .meta-card :global(.propaganda-meta) {
+  .inventory-notes {
     margin: 0;
   }
 
-  .meta-card :global(dl) {
+  /* Header row */
+  .inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--dossier-dark);
+  }
+
+  .header-text {
+    flex: 1;
+  }
+
+  .inventory-title {
+    font-family: var(--dossier-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--dossier-dark);
+    margin: 0 0 0.25rem 0;
+  }
+
+  .form-line {
+    font-family: var(--dossier-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: rgba(42, 37, 32, 0.6);
+    margin: 0;
+  }
+
+  /* Small audited stamp */
+  .stamp-small {
+    padding: 0.4rem 0.8rem;
+    background: transparent;
+    border: 2px solid var(--dossier-red);
+    color: var(--dossier-red);
+    font-family: var(--dossier-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transform: rotate(-5deg);
+    opacity: 0.85;
+    flex-shrink: 0;
+  }
+
+  /* Typed checklist grid */
+  .inventory-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+  }
+
+  .grid-row {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: var(--spacing-sm) var(--spacing-md);
-    margin: 0;
+    gap: var(--spacing-sm);
+    align-items: baseline;
   }
 
-  .meta-card :global(dt) {
+  .grid-label {
     font-family: var(--dossier-mono);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
     color: rgba(42, 37, 32, 0.7);
     letter-spacing: 0.03em;
   }
 
-  .meta-card :global(dd) {
-    font-family: var(--dossier-serif);
-    font-size: 0.95rem;
+  .grid-value {
+    font-family: var(--dossier-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
     color: var(--dossier-dark);
-    margin: 0;
+  }
+
+  /* Handwritten scribble block */
+  .handwritten {
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px dashed rgba(139, 125, 107, 0.3);
+    border-radius: 2px;
+    transform: rotate(-1deg);
+    position: relative;
+  }
+
+  .handwritten p {
+    font-family: "Bradley Hand", "Comic Sans MS", "Segoe Script", cursive;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--dossier-dark);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .handwritten p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Redaction bars for flavor */
+  .handwritten::before {
+    content: '';
+    position: absolute;
+    top: 25%;
+    right: 10%;
+    width: 35%;
+    height: 2px;
+    background: var(--dossier-dark);
+    opacity: 0.6;
+    transform: rotate(-1deg);
+  }
+
+  .handwritten::after {
+    content: '';
+    position: absolute;
+    bottom: 30%;
+    left: 15%;
+    width: 40%;
+    height: 2px;
+    background: var(--dossier-dark);
+    opacity: 0.6;
+    transform: rotate(1deg);
   }
 
   /* ============================================
@@ -475,6 +636,29 @@ const stampText = getStampText();
 
     .strip-item {
       min-width: auto;
+    }
+
+    .inventory-header {
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .stamp-small {
+      align-self: flex-start;
+    }
+
+    .grid-row {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+
+    .handwritten {
+      transform: rotate(0);
+      padding: var(--spacing-sm);
+    }
+
+    .handwritten p {
+      font-size: 0.85rem;
     }
 
     .asset-grid {
