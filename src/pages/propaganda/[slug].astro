@@ -1,0 +1,97 @@
+---
+/*
+  Page: src/pages/propaganda/[slug].astro
+  Purpose: Render a single 'propaganda' collection entry using the PropagandaPost layout.
+  Notes:
+   - Uses getStaticPaths to pre-generate pages.
+   - Renders Markdown/MDX using render(entry) helper from astro:content.
+   - Delegates metadata rendering to src/components/PropagandaMetaBox.astro.
+   - Major blocks are commented for the non-developer site owner.
+*/
+
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import PropagandaPost from '../../layouts/PropagandaPost.astro';
+import PropagandaMetaBox from '../../components/PropagandaMetaBox.astro';
+
+/* Build static paths for all propaganda entries so Astro can generate pages at build time */
+export async function getStaticPaths() {
+  const entries = await getCollection('propaganda');
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: entry,
+  }));
+}
+
+/* Strongly type props for IDE/editor help */
+type Props = CollectionEntry<'propaganda'>;
+
+/* Get the current entry (Astro.props) and render its content to a component. */
+const entry = Astro.props as Props;
+const { Content } = await render(entry);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{entry.data.title} — Propaganda</title>
+
+    <style>
+      main { width: 960px; margin: 0 auto; }
+      .preview-area { display: flex; gap: 1rem; align-items: flex-start; margin: 1rem 0; }
+      .preview-area img { max-width: 360px; border-radius: 8px; width: 100%; height: auto; object-fit: cover; }
+      .download-button { display: inline-block; padding: 0.6rem 1rem; background: rgb(var(--accent)); color: white; border-radius: 6px; text-decoration: none; }
+      .content { margin-top: 1rem; }
+      .back-link { display: inline-block; margin-top: 2rem; color: rgb(var(--gray)); text-decoration: none; }
+      @media (max-width: 720px) {
+        .preview-area { flex-direction: column; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Wrap the page in the PropagandaPost layout (header/footer handled there) -->
+    <PropagandaPost {...entry.data}>
+
+      <!-- 1) Title -->
+      <h1>{entry.data.title}</h1>
+
+      <!-- 2) Metadata box (component hides missing fields automatically) -->
+      <PropagandaMetaBox
+        type={entry.data.type}
+        year={entry.data.year}
+        printSize={entry.data.printSize}
+        orientation={entry.data.orientation}
+        tags={entry.data.tags}
+      />
+
+      <!-- 3) Visual preview + download -->
+      <section class="preview-area" aria-label="Preview and download">
+        {entry.data.previewImage ? (
+          <img src={entry.data.previewImage} alt={`Preview of ${entry.data.title}`} />
+        ) : null}
+
+        <div>
+          <a class="download-button" href={entry.data.downloadFile} download>
+            Download high-res file (PDF)
+          </a>
+
+          <p style="margin-top:0.5rem;color:rgb(var(--gray));font-size:0.9rem;">
+            File: {entry.data.downloadFile}
+          </p>
+        </div>
+      </section>
+
+      <!-- 4) Content: Render the Markdown/MDX body -->
+      <article class="content" aria-label="Propaganda content">
+        <Content />
+      </article>
+
+      <!-- Navigation: Back to the list page -->
+      <div>
+        <a class="back-link" href="/propaganda">← Back to Propaganda Archive</a>
+      </div>
+    </PropagandaPost>
+  </body>
+</html>
