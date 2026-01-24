@@ -1,10 +1,4 @@
 ---
-/*
-  Page: src/pages/propaganda/[slug].astro
-  Purpose: Render a single 'propaganda' collection entry.
-  Option A: The PAGE owns the title (<h1>), the LAYOUT is only a shell.
-*/
-
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import PropagandaPost from '../../layouts/PropagandaPost.astro';
 import PropagandaMetaBox from '../../components/PropagandaMetaBox.astro';
@@ -13,19 +7,16 @@ export async function getStaticPaths() {
   const entries = await getCollection('propaganda');
 
   return entries
-    .filter((entry) => typeof entry.slug === 'string' && entry.slug.length > 0 && !entry.slug.includes('/'))
+    .filter(
+      (entry) =>
+        typeof entry.slug === 'string' &&
+        entry.slug.length > 0 &&
+        !entry.slug.includes('/')
+    )
     .map((entry) => ({
       params: { slug: entry.slug },
       props: entry,
     }));
-}
-
-  const entries = await getCollection('propaganda');
-  return entries.map((entry) => ({
-    // Prefer entry.slug for URLs (more robust than entry.id if you ever add subfolders)
-    params: { slug: entry.slug },
-    props: entry,
-  }));
 }
 
 type Props = CollectionEntry<'propaganda'>;
