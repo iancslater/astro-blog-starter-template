@@ -6,17 +6,10 @@ import PropagandaMetaBox from '../../components/PropagandaMetaBox.astro';
 export async function getStaticPaths() {
   const entries = await getCollection('propaganda');
 
-  return entries
-    .filter(
-      (entry) =>
-        typeof entry.slug === 'string' &&
-        entry.slug.length > 0 &&
-        !entry.slug.includes('/')
-    )
-    .map((entry) => ({
-      params: { slug: entry.slug },
-      props: entry,
-    }));
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: entry,
+  }));
 }
 
 type Props = CollectionEntry<'propaganda'>;
