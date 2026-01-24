@@ -18,13 +18,21 @@ const entry = Astro.props as Props;
 const { Content } = await render(entry);
 
 // Computed fields for dossier aesthetic (no schema changes)
-const fileNo = `NU-${entry.id.toUpperCase().replace(/-/g, ' ')}`;
+// NU = Negative Utopia file system prefix
+const FILE_PREFIX = 'NU-';
+const fileNo = `${FILE_PREFIX}${entry.id.toUpperCase().replace(/-/g, ' ')}`;
 const classification = entry.data.type === 'poster' ? 'CONTROLLED' : 'RESTRICTED';
 const displayYear = entry.data.year || 'UNKNOWN';
 const displaySize = entry.data.printSize || 'STANDARD';
-const stampText = entry.data.tags?.includes('negative-utopia') 
-  ? 'NEGATIVE UTOPIA' 
-  : entry.data.type === 'poster' ? 'APPROVED' : 'ARCHIVED';
+
+// Determine stamp text based on tags and type
+const getStampText = () => {
+  if (entry.data.tags?.includes('negative-utopia')) {
+    return 'NEGATIVE UTOPIA';
+  }
+  return entry.data.type === 'poster' ? 'APPROVED' : 'ARCHIVED';
+};
+const stampText = getStampText();
 ---
 
 <!-- Layout should NOT render an H1 under Option A -->
@@ -110,6 +118,7 @@ const stampText = entry.data.tags?.includes('negative-utopia')
     --dossier-dark: #2a2520;
     --dossier-red: #c1272d;
     --dossier-border: #8b7d6b;
+    --dossier-border-subtle: rgba(139, 125, 107, 0.03);
     --dossier-shadow: rgba(0, 0, 0, 0.15);
     --dossier-mono: 'Courier New', Courier, monospace;
     --dossier-serif: Georgia, 'Times New Roman', serif;
@@ -143,8 +152,8 @@ const stampText = entry.data.tags?.includes('negative-utopia')
         0deg,
         transparent,
         transparent 2px,
-        rgba(139, 125, 107, 0.03) 2px,
-        rgba(139, 125, 107, 0.03) 4px
+        var(--dossier-border-subtle) 2px,
+        var(--dossier-border-subtle) 4px
       );
     pointer-events: none;
     z-index: 0;
