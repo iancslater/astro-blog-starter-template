@@ -45,17 +45,19 @@ let inventoryNotesMd = '';
 
 if (inventoryIndex !== -1) {
   // Extract inventory notes section
-  const afterHeading = bodyText.substring(inventoryIndex);
+  const afterHeading = bodyText.substring(inventoryIndex + inventoryHeading.length);
   // Find the next ## heading or end of file
-  const nextHeadingMatch = afterHeading.substring(inventoryHeading.length).match(/\n## /);
+  const nextHeadingMatch = afterHeading.match(/^## /m);
   const inventoryEnd = nextHeadingMatch 
     ? inventoryIndex + inventoryHeading.length + nextHeadingMatch.index 
     : bodyText.length;
   
   inventoryNotesMd = bodyText.substring(inventoryIndex + inventoryHeading.length, inventoryEnd).trim();
   
-  // Remove the entire inventory section from report
-  reportMd = bodyText.substring(0, inventoryIndex) + bodyText.substring(inventoryEnd);
+  // Remove the entire inventory section from report, preserving proper spacing
+  const beforeSection = bodyText.substring(0, inventoryIndex).trimEnd();
+  const afterSection = bodyText.substring(inventoryEnd).trimStart();
+  reportMd = afterSection ? `${beforeSection}\n\n${afterSection}` : beforeSection;
 }
 
 // Render markdown to HTML
