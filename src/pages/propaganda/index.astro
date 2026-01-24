@@ -66,7 +66,7 @@ const items = itemsWithIndex.map(x => x.item);
                 {item.data.type ? (item.data.type[0].toUpperCase() + item.data.type.slice(1)) : ''}
                 {item.data.year ? ` — ${item.data.year}` : ''}
               </p>
-
+            
               {item.data.tags ? (
                 <div class="tags">
                   {item.data.tags.map((t) => (
