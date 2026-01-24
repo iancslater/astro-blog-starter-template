@@ -16,88 +16,474 @@ type Props = CollectionEntry<'propaganda'>;
 
 const entry = Astro.props as Props;
 const { Content } = await render(entry);
+
+// Computed fields for dossier aesthetic (no schema changes)
+const fileNo = `NU-${entry.id.toUpperCase().replace(/-/g, ' ')}`;
+const classification = entry.data.type === 'poster' ? 'CONTROLLED' : 'RESTRICTED';
+const displayYear = entry.data.year || 'UNKNOWN';
+const displaySize = entry.data.printSize || 'STANDARD';
+const stampText = entry.data.tags?.includes('negative-utopia') 
+  ? 'NEGATIVE UTOPIA' 
+  : entry.data.type === 'poster' ? 'APPROVED' : 'ARCHIVED';
 ---
 
 <!-- Layout should NOT render an H1 under Option A -->
 <PropagandaPost {...entry.data}>
-  <!-- 1) Title -->
-  <h1>{entry.data.title}</h1>
+  <div class="dossier">
+    <!-- 1) Title + Stamp -->
+    <header class="dossier-header">
+      <h1>{entry.data.title}</h1>
+      <div class="stamp" aria-label={`Stamp: ${stampText}`}>{stampText}</div>
+    </header>
 
-  <!-- 2) Metadata box -->
-  <PropagandaMetaBox
-    type={entry.data.type}
-    year={entry.data.year}
-    printSize={entry.data.printSize}
-    orientation={entry.data.orientation}
-    tags={entry.data.tags}
-  />
-
-  <!-- 3) Visual preview + download -->
-  <section class="preview-area" aria-label="Preview and download">
-    {entry.data.previewImage ? (
-      <img src={entry.data.previewImage} alt={`Preview of ${entry.data.title}`} />
-    ) : null}
-
-    <div class="actions">
-      <a class="download-button" href={entry.data.downloadFile} download>
-        Download high-res file (PDF)
-      </a>
-      <!-- File: line removed (do not render it) -->
+    <!-- 2) Classification strip -->
+    <div class="classification-strip">
+      <div class="strip-item">
+        <span class="label">CLASSIFICATION</span>
+        <span class="value">{classification}</span>
+      </div>
+      <div class="strip-item">
+        <span class="label">FILE NO.</span>
+        <span class="value">{fileNo}</span>
+      </div>
+      <div class="strip-item">
+        <span class="label">YEAR</span>
+        <span class="value">{displayYear}</span>
+      </div>
+      <div class="strip-item">
+        <span class="label">MEDIUM</span>
+        <span class="value">{entry.data.type.toUpperCase()}</span>
+      </div>
+      <div class="strip-item">
+        <span class="label">SIZE</span>
+        <span class="value">{displaySize}</span>
+      </div>
     </div>
-  </section>
 
-  <!-- 4) Description / history -->
-  <article class="content" aria-label="Propaganda content">
-    <Content />
-  </article>
+    <!-- 3) Metadata card -->
+    <div class="meta-card">
+      <PropagandaMetaBox
+        type={entry.data.type}
+        year={entry.data.year}
+        printSize={entry.data.printSize}
+        orientation={entry.data.orientation}
+        tags={entry.data.tags}
+      />
+    </div>
 
-  <div>
-    <a class="back-link" href="/propaganda">← Back to Propaganda Archive</a>
+    <!-- 4) Asset grid: preview + actions -->
+    <div class="asset-grid">
+      <div class="attachment">
+        {entry.data.previewImage ? (
+          <img src={entry.data.previewImage} alt={`Preview of ${entry.data.title}`} />
+        ) : (
+          <div class="no-preview">NO PREVIEW AVAILABLE</div>
+        )}
+      </div>
+      
+      <div class="actions-panel">
+        <a class="download-button" href={entry.data.downloadFile} download>
+          DOWNLOAD PRINT FILE
+        </a>
+        <p class="note">High-resolution PDF for archival purposes</p>
+      </div>
+    </div>
+
+    <!-- 5) Report body (content) -->
+    <article class="report-body" aria-label="Propaganda content">
+      <Content />
+    </article>
+
+    <!-- 6) Back link -->
+    <div class="back-link-container">
+      <a class="back-link" href="/propaganda">← Return to Archive Index</a>
+    </div>
   </div>
 </PropagandaPost>
 
 <style>
-  main { width: 960px; margin: 0 auto; }
-
-  .preview-area {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    margin: 1rem 0;
+  /* ============================================
+     CSS VARIABLES - Soviet Dossier Palette
+     ============================================ */
+  :root {
+    --dossier-paper: #f4f1e8;
+    --dossier-dark: #2a2520;
+    --dossier-red: #c1272d;
+    --dossier-border: #8b7d6b;
+    --dossier-shadow: rgba(0, 0, 0, 0.15);
+    --dossier-mono: 'Courier New', Courier, monospace;
+    --dossier-serif: Georgia, 'Times New Roman', serif;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
   }
 
-  .preview-area img {
-    max-width: 360px;
-    border-radius: 8px;
+  /* ============================================
+     DOSSIER CONTAINER
+     ============================================ */
+  .dossier {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    background: var(--dossier-paper);
+    position: relative;
+    box-shadow: 0 4px 12px var(--dossier-shadow);
+  }
+
+  /* Paper texture effect using CSS gradient */
+  .dossier::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(139, 125, 107, 0.03) 2px,
+        rgba(139, 125, 107, 0.03) 4px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .dossier > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ============================================
+     HEADER: TITLE + STAMP
+     ============================================ */
+  .dossier-header {
+    position: relative;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--dossier-border);
+  }
+
+  .dossier-header h1 {
+    font-family: var(--dossier-serif);
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--dossier-dark);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin: 0 0 var(--spacing-sm) 0;
+    max-width: 75%;
+  }
+
+  /* Red stamp badge */
+  .stamp {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 3px solid var(--dossier-red);
+    color: var(--dossier-red);
+    font-family: var(--dossier-mono);
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transform: rotate(-3deg);
+    box-shadow: 0 2px 4px var(--dossier-shadow);
+    opacity: 0.85;
+  }
+
+  /* ============================================
+     CLASSIFICATION STRIP
+     ============================================ */
+  .classification-strip {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    padding: var(--spacing-md);
+    background: rgba(42, 37, 32, 0.05);
+    border: 1px solid var(--dossier-border);
+    border-left: 4px solid var(--dossier-dark);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .strip-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 120px;
+  }
+
+  .strip-item .label {
+    font-family: var(--dossier-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(42, 37, 32, 0.6);
+  }
+
+  .strip-item .value {
+    font-family: var(--dossier-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dossier-dark);
+  }
+
+  /* ============================================
+     METADATA CARD
+     ============================================ */
+  .meta-card {
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--dossier-border);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .meta-card :global(.propaganda-meta) {
+    margin: 0;
+  }
+
+  .meta-card :global(dl) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--spacing-sm) var(--spacing-md);
+    margin: 0;
+  }
+
+  .meta-card :global(dt) {
+    font-family: var(--dossier-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: rgba(42, 37, 32, 0.7);
+    letter-spacing: 0.03em;
+  }
+
+  .meta-card :global(dd) {
+    font-family: var(--dossier-serif);
+    font-size: 0.95rem;
+    color: var(--dossier-dark);
+    margin: 0;
+  }
+
+  /* ============================================
+     ASSET GRID: PREVIEW + ACTIONS
+     ============================================ */
+  .asset-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--dossier-border);
+  }
+
+  /* Photo attachment frame */
+  .attachment {
+    position: relative;
+    background: white;
+    padding: 0.75rem;
+    box-shadow: 
+      0 2px 4px var(--dossier-shadow),
+      0 4px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--dossier-border);
+    transform: rotate(-0.5deg);
+  }
+
+  .attachment img {
+    display: block;
     width: 100%;
     height: auto;
-    object-fit: cover;
-    border: 1px solid rgba(0,0,0,0.15);
+    border: 1px solid rgba(0, 0, 0, 0.1);
   }
 
-  .actions { display: flex; flex-direction: column; gap: 0.5rem; }
+  .no-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    background: rgba(42, 37, 32, 0.05);
+    border: 2px dashed var(--dossier-border);
+    font-family: var(--dossier-mono);
+    font-size: 0.9rem;
+    color: rgba(42, 37, 32, 0.5);
+    text-align: center;
+  }
+
+  /* Actions panel */
+  .actions-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    justify-content: center;
+  }
 
   .download-button {
     display: inline-block;
-    padding: 0.6rem 1rem;
-    background: rgb(var(--accent));
+    padding: 1rem 1.5rem;
+    background: var(--dossier-dark);
     color: white;
-    border-radius: 6px;
+    font-family: var(--dossier-mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     text-decoration: none;
+    text-align: center;
+    border: 3px solid var(--dossier-dark);
+    box-shadow: 0 3px 6px var(--dossier-shadow);
+    transition: all 0.2s ease;
   }
 
-  .content { margin-top: 1rem; }
+  .download-button:hover {
+    background: var(--dossier-red);
+    border-color: var(--dossier-red);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px var(--dossier-shadow);
+  }
+
+  .download-button:focus {
+    outline: 3px solid var(--dossier-red);
+    outline-offset: 3px;
+  }
+
+  .note {
+    font-family: var(--dossier-serif);
+    font-size: 0.85rem;
+    color: rgba(42, 37, 32, 0.7);
+    font-style: italic;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ============================================
+     REPORT BODY (MARKDOWN CONTENT)
+     ============================================ */
+  .report-body {
+    max-width: 720px;
+    margin: 0 auto var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: rgba(255, 255, 255, 0.7);
+    border-left: 3px solid var(--dossier-dark);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .report-body :global(p) {
+    font-family: var(--dossier-serif);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--dossier-dark);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .report-body :global(h2),
+  .report-body :global(h3),
+  .report-body :global(h4) {
+    font-family: var(--dossier-serif);
+    color: var(--dossier-dark);
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .report-body :global(ul),
+  .report-body :global(ol) {
+    font-family: var(--dossier-serif);
+    line-height: 1.7;
+    margin-bottom: var(--spacing-md);
+    padding-left: 1.5rem;
+  }
+
+  .report-body :global(blockquote) {
+    border-left: 4px solid var(--dossier-border);
+    padding-left: var(--spacing-md);
+    margin-left: 0;
+    font-style: italic;
+    color: rgba(42, 37, 32, 0.8);
+  }
+
+  /* ============================================
+     BACK LINK
+     ============================================ */
+  .back-link-container {
+    text-align: center;
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--dossier-border);
+  }
 
   .back-link {
     display: inline-block;
-    margin-top: 2rem;
-    color: rgb(var(--gray));
+    font-family: var(--dossier-mono);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--dossier-dark);
     text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--dossier-border);
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.2s ease;
   }
 
+  .back-link:hover {
+    background: var(--dossier-dark);
+    color: white;
+    border-color: var(--dossier-dark);
+  }
+
+  .back-link:focus {
+    outline: 2px solid var(--dossier-dark);
+    outline-offset: 2px;
+  }
+
+  /* ============================================
+     RESPONSIVE DESIGN
+     ============================================ */
   @media (max-width: 720px) {
-    main { width: auto; margin: 0 1rem; }
-    .preview-area { flex-direction: column; }
-    .preview-area img { max-width: 100%; }
+    .dossier {
+      padding: var(--spacing-md);
+    }
+
+    .dossier-header h1 {
+      font-size: 1.75rem;
+      max-width: 60%;
+    }
+
+    .stamp {
+      font-size: 0.75rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .classification-strip {
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .strip-item {
+      min-width: auto;
+    }
+
+    .asset-grid {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+    }
+
+    .attachment {
+      transform: rotate(0);
+    }
+
+    .report-body {
+      padding: var(--spacing-md);
+    }
+
+    .report-body :global(p) {
+      font-size: 1rem;
+    }
   }
 </style>
