@@ -59,14 +59,15 @@ const items = itemsWithIndex.map(x => x.item);
         <ul class="propaganda-list">
           {items.map((item) => (
             <li class="propaganda-list-item">
-              <a href={`/propaganda/${item.id}/`}>\n                <h3 class="title">{item.data.title}</h3>
+              <a href={`/propaganda/${item.id}/`}> 
+                <h3 class="title">{item.data.title}</h3>
               </a>
 
               <p class="propaganda-meta">
                 {item.data.type ? (item.data.type[0].toUpperCase() + item.data.type.slice(1)) : ''}
                 {item.data.year ? ` — ${item.data.year}` : ''}
               </p>
-            
+
               {item.data.tags ? (
                 <div class="tags">
                   {item.data.tags.map((t) => (
