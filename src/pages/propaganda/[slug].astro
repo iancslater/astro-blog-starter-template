@@ -1,0 +1,129 @@
+---
+/*
+  Page: src/pages/propaganda/[slug].astro
+  Purpose: Render a single 'propaganda' collection entry.
+
+  Notes:
+  - Uses the same BlogPost layout pattern as the blog posts.
+  - Loads all propaganda entries for getStaticPaths, and renders a single entry
+    using the content rendering helper from `astro:content`.
+  - Major blocks are commented so the site owner (non-developer) can follow.
+*/
+
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+/* Build the static paths for all propaganda entries:
+   - We load all entries from the `propaganda` collection and return
+     an array of params so Astro can generate pages at build time.
+   - Each returned object contains `params.slug` (the page URL) and
+     `props` (the entry object so it is available to the page as Astro.props).
+*/
+export async function getStaticPaths() {
+  const entries = await getCollection('propaganda');
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: entry,
+  }));
+}
+
+/* Strongly type the props for IDE/autocomplete (and to match project pattern) */
+type Props = CollectionEntry<'propaganda'>;
+
+/* `Astro.props` will contain the entry because we returned `props` in getStaticPaths.
+   We render the Markdown/MDX to a component (Content) using `render(entry)`.
+*/
+const entry = Astro.props as Props;
+const { Content } = await render(entry);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Use the same head/layout pattern as the blog -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{entry.data.title} — Propaganda</title>
+
+    <style>
+      main { width: 960px; margin: 0 auto; }
+      .propaganda-meta { background: rgba(0,0,0,0.03); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+      .meta-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+      .preview-area { display: flex; gap: 1rem; align-items: flex-start; margin: 1rem 0; }
+      .preview-area img { max-width: 360px; border-radius: 8px; width: 100%; height: auto; object-fit: cover; }
+      .download-button { display: inline-block; padding: 0.6rem 1rem; background: rgb(var(--accent)); color: white; border-radius: 6px; text-decoration: none; }
+      .content { margin-top: 1rem; }
+      .back-link { display: inline-block; margin-top: 2rem; color: rgb(var(--gray)); text-decoration: none; }
+      @media (max-width: 720px) {
+        .preview-area { flex-direction: column; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Header/footer/layout: use the same base layout component used by blog posts -->
+    <BlogPost {...entry.data}>
+
+      <!--
+        1) Title
+        Plain page title for this propaganda piece.
+      -->
+      <h1>{entry.data.title}</h1>
+
+      <!--
+        2) Metadata box
+        Shows Type, Year, Print Size, Orientation and Tags. Each field is optional
+        so we check for presence before rendering.
+      -->
+      <section class="propaganda-meta" aria-label="Propaganda metadata">
+        <div class="meta-row">
+          <div><strong>Type:</strong> {entry.data.type ? (entry.data.type[0].toUpperCase() + entry.data.type.slice(1)) : '—'}</div>
+          <div><strong>Year:</strong> {entry.data.year ?? '—'}</div>
+          <div><strong>Print size:</strong> {entry.data.printSize ?? '—'}</div>
+          <div><strong>Orientation:</strong> {entry.data.orientation ? (entry.data.orientation[0].toUpperCase() + entry.data.orientation.slice(1)) : '—'}</div>
+          {entry.data.tags ? <div><strong>Tags:</strong> {entry.data.tags.join(', ')}</div> : null}
+        </div>
+      </section>
+
+      <!--
+        3) Visual preview area + download button
+        - If previewImage exists we show it.
+        - We always show a download link (it uses the `download` attribute so browsers attempt to download).
+      -->
+      <section class="preview-area" aria-label="Preview and download">
+        {entry.data.previewImage ? (
+          <!-- preview image (if provided). Add alt text for accessibility. -->
+          <img src={entry.data.previewImage} alt={`Preview of ${entry.data.title}`} />
+        ) : null}
+
+        <div>
+          <!-- Download button: downloads the high-res file from /public as provided in frontmatter -->
+          <a class="download-button" href={entry.data.downloadFile} download>
+            Download high-res file (PDF)
+          </a>
+
+          <!-- Optional short note about the file -->
+          <p style="margin-top:0.5rem;color:rgb(var(--gray));font-size:0.9rem;">
+            File: {entry.data.downloadFile}
+          </p>
+        </div>
+      </section>
+
+      <!--
+        4) Content section
+        Render the Markdown/MDX body for the propaganda entry.
+        This is where the description, history, and anecdotes live.
+      -->
+      <article class="content" aria-label="Propaganda content">
+        <Content />
+      </article>
+
+      <!--
+        Navigation: Back to the list page so visitors can easily return.
+      -->
+      <div>
+        <a class="back-link" href="/propaganda">← Back to Propaganda Archive</a>
+      </div>
+    </BlogPost>
+  </body>
+</html>
