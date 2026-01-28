@@ -7,29 +7,47 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main class="paper container">
-			<h1>Transmission received...</h1>
-			<p>
-				If you want a picture <span style="text-decoration: line-through;">of the future</span>, imagine a boot stamping on a human face.
-			</p>
-			<p>
-				This is negative utopia.
-			</p>
-			<p>Here are a few ideas on how to experience this website:</p>
-			<ul>
-				<li>Visit the <a href="/propaganda">Propaganda Archive</a> for our classic-era creations you may remember</li>
-				<li>Check back for more art
-			</ul>
-			</p>
-			<p>
-				Stay in touch with your comrades.
-			</p>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+    <Header />
+
+    <main class="paper container">
+      <h1>Transmission received...</h1>
+
+      <section class="intro">
+        <div class="intro-copy">
+          <p>
+            If you want a picture of the future, imagine a boot stamping on a human face FOREVER.
+          </p>
+
+          <p>This is negative utopia.</p>
+
+          <p>Here are a few ideas on how to experience this website:</p>
+
+          <ul>
+            <li>
+              Visit the <a href="/propaganda">Propaganda Archive</a> for our classic-era creations you may remember
+            </li>
+            <li>Check back for more art</li>
+          </ul>
+
+          <p>Stay in touch with your comrades.</p>
+        </div>
+
+        <img
+          class="intro-thumb"
+          src="/negative-utopia-logo-transparent.png"
+          alt="Negative Utopia logo"
+          width="180"
+          height="180"
+          loading="eager"
+          decoding="async"
+        />
+      </section>
+    </main>
+
+    <Footer />
+  </body>
 </html>
