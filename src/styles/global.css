@@ -6,7 +6,9 @@
 
 :root {
 	--color-bg: #000;
-	--color-surface: #f2f4f6;
+	--paper-outer: #D9DEE4;
+	--paper-inner: #C9D0D8;
+	--color-surface: var(--paper-outer);
 	--color-ink: #000;
 	--color-accent: #c1272d;
 
