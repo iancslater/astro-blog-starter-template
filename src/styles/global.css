@@ -234,3 +234,35 @@ a[aria-current="page"] {
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }
+
+.intro {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.intro-copy > :first-child {
+  margin-top: 0;
+}
+
+.intro-thumb {
+  width: 180px;
+  height: auto;
+  display: block;
+  border: 1px solid var(--gray-2);
+  border-radius: 10px;
+  background: var(--gray-1);
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 720px) {
+  .intro {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-thumb {
+    width: 160px;
+    justify-self: start;
+  }
+}
