@@ -270,3 +270,15 @@ a[aria-current="page"] {
     justify-self: start;
   }
 }
+
+h1, h2, h3 {
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+@media (max-width: 520px) {
+  h1 {
+    font-size: clamp(2.2rem, 9vw, 3.4rem);
+  }
+}
