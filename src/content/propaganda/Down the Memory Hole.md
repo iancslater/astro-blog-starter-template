@@ -12,7 +12,7 @@ downloadFile: /downloads/memoryhole.pdf
 previewImage: /memoryhole.png
 ---
 
-Ugly but it got the point across... _the memory hole_ was created out of "recycle" signage we saw every day and represented the disposal of inconvenient truths.
+**Ugly but it got the point across…** _the memory hole_ was created out of "recycle" signage we saw every day and represented the disposal of inconvenient truths.
 
 In retrospect, what we were missing at this early stage was a face. Those became Orwell himself, Elián González, and facecrime lauren.
 
