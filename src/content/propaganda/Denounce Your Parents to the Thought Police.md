@@ -12,7 +12,7 @@ downloadFile: /downloads/parents_restored_11x17_photo_grit2.pdf
 previewImage: /parents_restored_11x17_photo_grit2_300dpi.png
 ---
 
-**Current events at the time** brought us a starter for this poster. Though we could have used a generic image to represent _parental denouncement_, we opted to portray the controversy at the time.
+**Current events at the time** brought us a starter for this poster. Though we could have used a generic image to represent _parental denouncement_, we opted to portray the controversy.
 
 Perhaps we're due for an update.
 
