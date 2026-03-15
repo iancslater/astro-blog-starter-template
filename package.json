@@ -24,6 +24,7 @@
 		"wrangler": "4.63.0"
 	},
 	"overrides": {
+		"undici": ">=7.24.0",
 		"wrangler": "4.63.0"
 	},
 	"private": true,
