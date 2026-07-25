@@ -43,7 +43,8 @@ test.describe("built worker homepage", () => {
 		const bodyText = (await page.locator("body").innerText()).trim();
 
 		expect(bodyText).toContain("This is negative utopia.");
-		expect(bodyText.length).toBeGreaterThan(200);
+		await expect(header).toContainText("Home");
+		await expect(footer).toContainText("the party is always right.");
 
 		for (const token of MALFORMED_TOKENS) {
 			expect(bodyText).not.toContain(token);

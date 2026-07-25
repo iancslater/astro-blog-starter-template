@@ -17,13 +17,24 @@ import { existsSync } from "node:fs";
  * Run with: npm run test:worker
  */
 
+/**
+ * By default this config uses Playwright's own bundled/managed Chromium
+ * (installed via `npx playwright install chromium`, see the `test:worker`
+ * script in package.json) so browser behavior stays deterministic across
+ * environments. A system-installed browser is only used if
+ * `PLAYWRIGHT_USE_SYSTEM_CHROMIUM=1` is explicitly set, e.g. for
+ * environments where installing Playwright's browser binaries isn't
+ * possible.
+ */
 const SYSTEM_CHROMIUM_PATHS = [
 	"/usr/bin/chromium-browser",
 	"/usr/bin/chromium",
 	"/usr/bin/google-chrome",
 ];
 
-const executablePath = SYSTEM_CHROMIUM_PATHS.find(existsSync);
+const executablePath = process.env.PLAYWRIGHT_USE_SYSTEM_CHROMIUM
+	? SYSTEM_CHROMIUM_PATHS.find(existsSync)
+	: undefined;
 
 const PORT = 8791;
 

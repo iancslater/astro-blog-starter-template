@@ -43,7 +43,7 @@
 		"deploy": "wrangler deploy",
 		"dev": "astro dev",
 		"preview": "astro build && wrangler dev",
-		"test:worker": "npm run build && playwright test --config playwright.worker.config.ts"
+		"test:worker": "playwright install --with-deps chromium && npm run build && playwright test --config playwright.worker.config.ts"
 	},
 	"type": "module"
 }
