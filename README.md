@@ -1,64 +1,146 @@
-# Astro Starter Kit: Blog
+# Negative Utopia
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/astro-blog-starter-template)
+A dystopian art and writing project built around an archive of downloadable propaganda posters, stickers, and related editorial work.
 
-![Astro Template Preview](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+The site is built with Astro and deployed as a Cloudflare Worker. Content lives in the repository as Markdown or MDX and is organized through Astro content collections.
 
-<!-- dash-content-start -->
+## What is here
 
-Create a blog with Astro and deploy it on Cloudflare Workers as a [static website](https://developers.cloudflare.com/workers/static-assets/).
+- A **Propaganda Archive** for posters and stickers, including metadata, tags, preview images, and downloadable source files
+- A **blog collection** for longer-form writing in Markdown or MDX
+- Static, accessible Astro pages with shared site navigation and metadata
+- RSS and sitemap generation
+- A production-path Playwright smoke test that exercises the built Cloudflare Worker rather than only the Astro development server
 
-Features:
+## Technology
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-- ✅ Built-in Observability logging
+- [Astro](https://astro.build/)
+- [MDX](https://mdxjs.com/)
+- [Cloudflare Workers](https://developers.cloudflare.com/workers/)
+- [Playwright](https://playwright.dev/)
+- TypeScript
 
-<!-- dash-content-end -->
+Node.js **22.12 or newer** is required.
 
-## Getting Started
+## Content model
 
-Outside of this repo, you can start a new project with this template using [C3](https://developers.cloudflare.com/pages/get-started/c3/) (the `create-cloudflare` CLI):
+Content collections are defined in `src/content.config.ts`.
 
-```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/astro-blog-starter-template
+### Propaganda
+
+Files live in:
+
+```text
+src/content/propaganda/
 ```
 
-A live public deployment of this template is available at [https://astro-blog-starter-template.templates.workers.dev](https://astro-blog-starter-template.templates.workers.dev)
+Supported frontmatter:
 
-## 🚀 Project Structure
+```yaml
+title: Example poster
+type: poster # poster or sticker
+downloadFile: /downloads/example-poster.pdf
+printSize: 11 × 17 inches
+orientation: portrait # portrait or landscape
+year: "2026"
+tags:
+  - surveillance
+  - resistance
+previewImage: /images/example-poster.png
+```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Required fields are `title`, `type`, and `downloadFile`. The remaining fields are optional.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+### Blog
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+Files live in:
 
-Any static assets, like images, can be placed in the `public/` directory.
+```text
+src/content/blog/
+```
 
-## 🧞 Commands
+Supported frontmatter:
 
-All commands are run from the root of the project, from a terminal:
+```yaml
+title: Example post
+description: A short summary of the post.
+pubDate: 2026-07-25
+updatedDate: 2026-07-26
+heroImage: /images/example-post.jpg
+```
 
-| Command                           | Action                                           |
-| :-------------------------------- | :----------------------------------------------- |
-| `npm install`                     | Installs dependencies                            |
-| `npm run dev`                     | Starts local dev server at `localhost:4321`      |
-| `npm run build`                   | Build your production site to `./dist/`          |
-| `npm run preview`                 | Preview your build locally, before deploying     |
-| `npm run astro ...`               | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help`         | Get help using the Astro CLI                     |
-| `npm run build && npm run deploy` | Deploy your production site to Cloudflare        |
-| `npm wrangler tail`               | View real-time logs for all Workers              |
+Blog entries can use either `.md` or `.mdx`.
 
-## 👀 Want to learn more?
+## Local development
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Install dependencies:
 
-## Credit
+```bash
+npm ci
+```
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+Start the Astro development server:
+
+```bash
+npm run dev
+```
+
+The site will be available at `http://localhost:4321` unless Astro selects another open port.
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Astro development server |
+| `npm run build` | Create the production build in `dist/` |
+| `npm run preview` | Build and serve the generated Worker locally with Wrangler |
+| `npm run test:worker` | Build the site and run the Playwright smoke test against the generated Worker |
+| `npm run check` | Build, run TypeScript checking, and perform a Wrangler deployment dry run |
+| `npm run cf-typegen` | Generate Cloudflare binding types |
+| `npm run deploy` | Deploy the current build through Wrangler |
+
+## Project structure
+
+```text
+public/                    Static images, downloads, fonts, and other public assets
+src/components/            Shared Astro components
+src/content/blog/          Markdown and MDX blog entries
+src/content/propaganda/    Propaganda archive entries
+src/layouts/               Shared page layouts
+src/pages/                 File-based routes, RSS, and sitemap endpoints
+src/styles/                Global styles
+ tests/worker-smoke/        Built-Worker Playwright coverage
+astro.config.mjs           Astro, MDX, sitemap, Cloudflare, and session configuration
+playwright.worker.config.ts
+wrangler.json              Cloudflare Worker configuration
+```
+
+## Deployment notes
+
+The project deploys to Cloudflare Workers through `wrangler.json`.
+
+The Cloudflare Worker currently retains the historical name `astro-blog-starter-template`. That identifier is intentionally separate from the GitHub repository and project name so renaming the repository does not create a second Worker or disrupt the existing deployment.
+
+Two adapter settings are important to the current production shape:
+
+- Prerendering uses Astro's Node environment because the Workerd prerender path in the current Astro 7 / Cloudflare adapter combination previously serialized Astro page bodies as `[object Object]`.
+- The site uses Astro's null session driver because it does not use sessions; this prevents the adapter from provisioning an unnecessary `SESSION` KV namespace.
+
+Do not remove either setting without validating a clean production build, the built Worker, and the deployed preview.
+
+## Verification
+
+Before deploying changes, run:
+
+```bash
+npm ci
+npm run build
+npm run test:worker
+npm run check
+```
+
+The Worker smoke test verifies that the homepage contains meaningful visible content and rejects malformed output such as `[object Object]` or `[object Promise]`.
+
+## Credits
+
+The project began from the Astro blog starter and retains design lineage from [Bear Blog](https://github.com/HermanMartinus/bearblog/). It has since been adapted into the Negative Utopia site and propaganda archive.
