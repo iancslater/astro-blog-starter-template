@@ -9,7 +9,12 @@ import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
 	site: "https://example.com",
 	integrations: [mdx(), sitemap()],
-	adapter: cloudflare(),
+	adapter: cloudflare({
+		// Prerender static pages with Astro's Node environment instead of workerd.
+		// The default Workerd prerenderer emits "[object Object]" for prerendered
+		// Astro page bodies with the current Astro 7 / Cloudflare adapter stack.
+		prerenderEnvironment: "node",
+	}),
 	// Disable the SESSION KV binding that @astrojs/cloudflare auto-injects.
 	// Without this, wrangler tries to provision the KV namespace on every deploy
 	// and fails with error 10014 ("already exists") after the first deployment.
