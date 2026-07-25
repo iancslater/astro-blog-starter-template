@@ -2,6 +2,8 @@
 
 A dystopian art and writing project built around an archive of downloadable propaganda posters, stickers, and related editorial work.
 
+**Live site:** [astro-blog-starter-template.zptqqjpz4n.workers.dev](https://astro-blog-starter-template.zptqqjpz4n.workers.dev/)
+
 The site is built with Astro and deployed as a Cloudflare Worker. Content lives in the repository as Markdown or MDX and is organized through Astro content collections.
 
 ## What is here
@@ -109,7 +111,7 @@ src/content/propaganda/    Propaganda archive entries
 src/layouts/               Shared page layouts
 src/pages/                 File-based routes, RSS, and sitemap endpoints
 src/styles/                Global styles
- tests/worker-smoke/        Built-Worker Playwright coverage
+tests/worker-smoke/        Built-Worker Playwright coverage
 astro.config.mjs           Astro, MDX, sitemap, Cloudflare, and session configuration
 playwright.worker.config.ts
 wrangler.json              Cloudflare Worker configuration
