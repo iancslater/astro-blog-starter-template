@@ -1,6 +1,6 @@
 # Negative Utopia
 
-A dystopian art and writing project built around an archive of downloadable propaganda posters, stickers, and related editorial work.
+A dystopian art and writing project built around an archive of downloadable propaganda posters and stickers.
 
 **Live site:** [negativeutopia.org](https://negativeutopia.org/)
 
