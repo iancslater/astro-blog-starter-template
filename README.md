@@ -2,7 +2,7 @@
 
 A dystopian art and writing project built around an archive of downloadable propaganda posters, stickers, and related editorial work.
 
-**Live site:** [astro-blog-starter-template.zptqqjpz4n.workers.dev](https://astro-blog-starter-template.zptqqjpz4n.workers.dev/)
+**Live site:** [negativeutopia.org](https://negativeutopia.org/)
 
 The site is built with Astro and deployed as a Cloudflare Worker. Content lives in the repository as Markdown or MDX and is organized through Astro content collections.
 
