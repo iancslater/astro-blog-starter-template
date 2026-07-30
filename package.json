@@ -22,14 +22,14 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.59.1",
-		"wrangler": "4.100.0"
+		"wrangler": "4.114.0"
 	},
 	"overrides": {
 		"esbuild": "^0.28.1",
 		"undici": "^7.24.0",
 		"ws": "^8.21.0",
-		"wrangler": "4.100.0",
-		"@cloudflare/vite-plugin": "1.40.2"
+		"wrangler": "4.114.0",
+		"@cloudflare/vite-plugin": "1.47.0"
 	},
 	"engines": {
 		"node": ">=22.12.0"
